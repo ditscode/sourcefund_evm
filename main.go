@@ -38,6 +38,9 @@ var cex = []string{
 	"Upbit",
 	"FixedFloat",
 	"Mexc",
+	"Okx",
+	"Orbiter",
+	"Bybit",
 }
 
 func getSourceFundCallApi(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +53,6 @@ func getSourceFundCallApi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Send the result as a JSON response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
 }
@@ -58,23 +60,19 @@ func getSourceFundCallApi(w http.ResponseWriter, r *http.Request) {
 func getSourceFund(addr string) ([]SourceFund, error) {
 	url := fmt.Sprintf("https://etherscan.io/address/%s", addr)
 
-	// Make an HTTP GET request to the URL
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert the body to a string
 	bodyStr := string(body)
 
-	// Use regular expressions to extract data between markers
 	re := regexp.MustCompile(`data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="(.*?)<\/a><a class="js-clipboar`)
 	matches := re.FindAllStringSubmatch(bodyStr, -1)
 
@@ -104,7 +102,6 @@ func getSourceFund(addr string) ([]SourceFund, error) {
 		}
 	}
 
-	// Remove duplicates from the result
 	finalData = removeDuplicates(finalData)
 
 	return finalData, nil
@@ -130,7 +127,6 @@ func main() {
 
 	http.Handle("/", r)
 
-	// Start the HTTP server on port 8080
 	fmt.Println("Server started on :8080")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
